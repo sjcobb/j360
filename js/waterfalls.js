@@ -38,12 +38,23 @@ function onWindowResize() {
 function applyTex(location, wrappingX, wrappingY) {
     var texName;
 
-    THREE.ImageUtils.crossOrigin = '';
+    //THREE.ImageUtils.crossOrigin = '';
     texName = THREE.ImageUtils.loadTexture(location);
     texName.wrapS = texName.wrapT = THREE.RepeatWrapping;
     texName.repeat.set(wrappingX, wrappingY);
 
     return texName;
+
+    /*
+    var loader = new THREE.TextureLoader();
+    loader.load('assets/textures/grass.png', onTextureLoaded);
+
+    function onTextureLoaded(texture) {
+        loadSkyBox();
+        setupStage(); // For high end VR devices like Vive and Oculus, take into account the stage parameters provided.
+    }
+    */
+
 }
 
 /*
@@ -74,6 +85,8 @@ function initTween() {
 
     var tween1 = new TWEEN.Tween(source)
         .to(target, 1200) /* Animation lasts 1200 ms.  */
+        //.to(target, 2500) /* Animation lasts 1200 ms.  */
+        //.repeat(5) /* Animation never stops.  */
         .repeat(Infinity) /* Animation never stops.  */
         .yoyo(true) /* Yoyo effect.  */
         /* Animation interpolating function.  */
@@ -241,11 +254,17 @@ function init() {
     //console.log(equiManaged);
 
     /* Camera positioning and pointing it to the center of the scene.  */
+    
     camera.position.x = -waterfall.startX * 2;
     camera.position.y = waterfall.h * 4;
     camera.position.z = waterfall.h * 4;
-    /* Look at the center of the scene.  */
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(0, 0, 0); //Look at the center of the scene
+    
+
+    // camera.position.x = -waterfall.startX;
+    // camera.position.y = waterfall.h;
+    // camera.position.z = waterfall.h;
+    // camera.lookAt(0, 0, 0);
 
     //var container = document.getElementsByClassName('container')[0];
     var container = document.getElementById('WebGL-output');
@@ -311,7 +330,7 @@ function createTrees() {
 
     var treeMaterial = new THREE.SpriteMaterial({
         map: treeTexture,
-        useScreenCoordinates: false
+        //useScreenCoordinates: false
     });
     for (i = 0; trees.posZRight - i * 200 > -scr.w; i++) {
         /* Right trees.  */
@@ -354,7 +373,7 @@ function createTreeTrunk() {
         100,
         false
     );
-    treeTrunkTex = applyTex("https://raw.githubusercontent.com/free-unife/threejs-waterfall/master/textures/treeTrunkTex.jpg", 1, 1);
+    treeTrunkTex = applyTex("assets/textures/treeTrunkTex.jpg", 1, 1);
     treeTrunkMaterial = new THREE.MeshBasicMaterial({ map: treeTrunkTex });
     treeTrunk = new THREE.Mesh(treeTrunkGeometry, treeTrunkMaterial);
 
@@ -375,7 +394,7 @@ function createLake(dimX, dimY, posX, posY, posZ, rotX) {
     var lLake, lLakeGeometry, lLakeMaterial, lLakeTex;
 
     lLakeGeometry = new THREE.PlaneGeometry(dimX, dimY);
-    lLakeTex = applyTex("https://raw.githubusercontent.com/free-unife/threejs-waterfall/master/textures/water.jpg", 50, 50);
+    lLakeTex = applyTex("assets/textures/water.jpg", 50, 50);
     lLakeMaterial = new THREE.MeshBasicMaterial({
         color: 0x00005f,
         side: THREE.DoubleSide,
@@ -542,7 +561,7 @@ function createRiver(dimX, dimY, dimZ, posY, posZ) {
     var lRiver, lRiverGeometry, lRiverMaterial, lRiverTex;
 
     lRiverGeometry = new THREE.BoxGeometry(dimX, dimY, dimZ);
-    lRiverTex = applyTex("https://raw.githubusercontent.com/free-unife/threejs-waterfall/master/textures/water512.jpg", 4, 8);
+    lRiverTex = applyTex("assets/textures/water512.jpg", 4, 8);
 
     lRiverMaterial = new THREE.MeshBasicMaterial({ map: lRiverTex });
     lRiver = new THREE.Mesh(lRiverGeometry, lRiverMaterial);
@@ -557,7 +576,7 @@ function createRiver(dimX, dimY, dimZ, posY, posZ) {
 function createSkyBox() {
     var path, urls, textureCube, shader, skyMaterial, sky;
 
-    path = "https://raw.githubusercontent.com/free-unife/threejs-waterfall/master/textures/";
+    path = "assets/textures/";
     urls = [
         path + "posx.jpg",
         path + "negx.jpg",
@@ -593,7 +612,7 @@ function defineParticles() {
 
     pGeometry = new THREE.Geometry();
     particleTex = applyTex("https://raw.githubusercontent.com/free-unife/threejs-waterfall/master/textures/drop2.png", 1, 1);
-    pMaterial = new THREE.PointCloudMaterial({
+    pMaterial = new THREE.PointsMaterial({
         color: 0x3399ff /* Blue-like colour.  */,
         map: particleTex /* Texture.  */,
         size: 10,
@@ -625,7 +644,7 @@ function defineParticles() {
         time[p].start();
     }
 
-    particleSys = new THREE.PointCloud(pGeometry, pMaterial);
+    particleSys = new THREE.Points(pGeometry, pMaterial);
     particleSys.sortParticles = true;
     particleSys.visible = false; /* Inherited from Object3D.  */
     scene.add(particleSys);
@@ -634,7 +653,7 @@ function defineParticles() {
 	   See previous comments.  */
     pGeometry = new THREE.Geometry();
     particleTex = applyTex("https://raw.githubusercontent.com/free-unife/threejs-waterfall/master/textures/drop.png", 1, 1);
-    pMaterial = new THREE.PointCloudMaterial({
+    pMaterial = new THREE.PointsMaterial({
         color: 0xffffff,
         map: particleTex,
         size: 10,
@@ -662,7 +681,7 @@ function defineParticles() {
         lowerTime[p].start();
     }
 
-    lowerParticleSys = new THREE.PointCloud(pGeometry, pMaterial);
+    lowerParticleSys = new THREE.Points(pGeometry, pMaterial);
     lowerParticleSys.sortParticles = true;
     lowerParticleSys.visible = false;
 
@@ -708,6 +727,7 @@ function fallingParticlesMgr() {
     while (pCount-- /* Loop all particles. */) {
         /* Get the current particle.  */
         var particle = particles[pCount];
+        //console.log({particle});
         /* Calculate elapsed time and use modulus operator to
 		   solve animation problems.  */
         var elapsed = time[pCount].getElapsedTime() % 20;
