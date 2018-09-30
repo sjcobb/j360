@@ -91,8 +91,7 @@ function initTween() {
         .yoyo(true) /* Yoyo effect.  */
         /* Animation interpolating function.  */
         .easing(TWEEN.Easing.Elastic.InOut)
-        .onUpdate(function() /* Tween update function.  */
-        {
+        .onUpdate(function () /* Tween update function.  */ {
             /* Reassign old position at the end of each loop.  */
             treeTrunk.position.y = source.y;
             /* Give a rotation effect to the trunk.  */
@@ -111,16 +110,18 @@ var scene, camera, renderer;
 
 /* Constants.  */
 var scr =
-    /* Screen dimensions.  */
-    {
-        w: window.innerWidth,
-        h: window.innerHeight
-    };
+/* Screen dimensions.  */
+{
+    w: window.innerWidth,
+    h: window.innerHeight
+};
 
 var gAccel = -9.81; /* g = 9.81 m/s^2.  */
+//var particleCount = 4096; /* Falling particles.  */
+//var lowerParticleCount = 2048; /* Particles at the base of the waterfall.  */
 
-var particleCount = 4096; /* Falling particles.  */
-var lowerParticleCount = 2048; /* Particles at the base of the waterfall.  */
+var particleCount = 1096; /* Falling particles.  */
+var lowerParticleCount = 548; /* Particles at the base of the waterfall.  */
 
 /* Data structs.  */
 var waterfall = {
@@ -131,27 +132,27 @@ var waterfall = {
 };
 
 var globlPart =
-    /* Falling particles coordinate proprieties.  */
-    {
-        pXVar: waterfall.w,
-        pXMean: -(scr.w / 8),
+/* Falling particles coordinate proprieties.  */
+{
+    pXVar: waterfall.w,
+    pXMean: -(scr.w / 8),
 
-        pYVar: 4000,
-        pYMean: -10,
+    pYVar: 4000,
+    pYMean: -10,
 
-        pZVar: -50,
-        pZMean: -100,
+    pZVar: -50,
+    pZMean: -100,
 
-        initVel: 0.5,
-        visible: false
-    };
+    initVel: 0.5,
+    visible: false
+};
 
 var wall =
-    /* Waterfall wall.  */
-    {
-        h: scr.h / 2,
-        pZ: globlPart.pZMean - scr.w / 1.9
-    };
+/* Waterfall wall.  */
+{
+    h: scr.h / 2,
+    pZ: globlPart.pZMean - scr.w / 1.9
+};
 
 var lowerGloblPart = {
     pXVar: waterfall.w,
@@ -168,12 +169,12 @@ var lowerGloblPart = {
 };
 
 var riverOutput =
-    /* Two rectangles drawn at the end of the river.  */
-    {
-        dimY: 20,
-        dimZ: -lowerGloblPart.pZVar,
-        startX: globlPart.pXVar + globlPart.pXMean + 2
-    };
+/* Two rectangles drawn at the end of the river.  */
+{
+    dimY: 20,
+    dimZ: -lowerGloblPart.pZVar,
+    startX: globlPart.pXVar + globlPart.pXMean + 2
+};
 var riverOutputStruct = {
     X0: riverOutput.startX,
     Y0: waterfall.h - riverOutput.dimY,
@@ -232,6 +233,7 @@ function main() {
     defineParticles(); /* Create particles.  */
 
     render(); /* Start rendering.  */
+    //animate();
 }
 
 /* Function used to initialize all the core elements like scene, camera, 
@@ -254,12 +256,12 @@ function init() {
     //console.log(equiManaged);
 
     /* Camera positioning and pointing it to the center of the scene.  */
-    
+
     camera.position.x = -waterfall.startX * 2;
     camera.position.y = waterfall.h * 4;
     camera.position.z = waterfall.h * 4;
     camera.lookAt(0, 0, 0); //Look at the center of the scene
-    
+
 
     // camera.position.x = -waterfall.startX;
     // camera.position.y = waterfall.h;
@@ -326,7 +328,7 @@ function createTrees() {
     var i, tree;
 
     THREE.ImageUtils.crossOrigin = '';
-    var treeTexture = THREE.ImageUtils.loadTexture("https://raw.githubusercontent.com/free-unife/threejs-waterfall/master/textures/tree.png");
+    var treeTexture = THREE.ImageUtils.loadTexture("assets/textures/tree.png");
 
     var treeMaterial = new THREE.SpriteMaterial({
         map: treeTexture,
@@ -611,7 +613,7 @@ function defineParticles() {
     var particleTex, p, pGeometry;
 
     pGeometry = new THREE.Geometry();
-    particleTex = applyTex("https://raw.githubusercontent.com/free-unife/threejs-waterfall/master/textures/drop2.png", 1, 1);
+    particleTex = applyTex("assets/textures/drop2.png", 1, 1);
     pMaterial = new THREE.PointsMaterial({
         color: 0x3399ff /* Blue-like colour.  */,
         map: particleTex /* Texture.  */,
@@ -652,7 +654,7 @@ function defineParticles() {
     /* Create lower particles.
 	   See previous comments.  */
     pGeometry = new THREE.Geometry();
-    particleTex = applyTex("https://raw.githubusercontent.com/free-unife/threejs-waterfall/master/textures/drop.png", 1, 1);
+    particleTex = applyTex("assets/textures/drop.png", 1, 1);
     pMaterial = new THREE.PointsMaterial({
         color: 0xffffff,
         map: particleTex,
@@ -690,29 +692,43 @@ function defineParticles() {
 
 /* Rendering loop.  */
 function render() {
-    /* Update particles.  */
+
     particleMgr();
 
-    /* Update camera which depends from mouse controls.  */
     var delta = clock.getDelta();
+    //var delta = clock.getDelta() + 1000;
+
     cameraControls.update(delta);
     //console.log({cameraControls});
 
-    /* Update tree trunk. */
-    TWEEN.update();
+    //TWEEN.update(); //update tree trunk
 
-    /* If the waterfall particles are not yet visible...  */
-    if (particleSys.visible == true && treeTrunk.visible == false)
+    if (particleSys.visible == true && treeTrunk.visible == false) //If the waterfall particles are not yet visible...
         treeTrunk.visible = true;
 
-    /* Render scene.  */
     renderer.render(scene, camera);
-    /* Next rendering request, i.e. loop.  */
-    requestAnimationFrame(render);
 
-    /*** J360 ***/
-    capturer360.capture(canvas);
+    setInterval(function () {
+        requestAnimationFrame(render);
+    }, 500);
+    //requestAnimationFrame(render);
+
+    capturer360.capture(canvas); //J360
 }
+
+/*var lastRender = 0;
+function animate(timestamp) {
+    var delta = Math.min(timestamp - lastRender, 500);
+    lastRender = timestamp;
+    var elapsed = clock.getElapsedTime();
+
+    cameraControls.update(elapsed);
+    particleMgr();
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(animate);
+}*/
 
 /* Particle manager function, called by renderer.  */
 function particleMgr() {
@@ -728,11 +744,16 @@ function fallingParticlesMgr() {
         /* Get the current particle.  */
         var particle = particles[pCount];
         //console.log({particle});
+
         /* Calculate elapsed time and use modulus operator to
 		   solve animation problems.  */
         var elapsed = time[pCount].getElapsedTime() % 20;
+        //var elapsed = time[pCount].getElapsedTime();
+        //console.log(elapsed);
+
         /* Check if we need to reset particle position.  */
         if (particle.position.y < waterfall.l) {
+            //console.log("particle needs reset");
             /* - height */
             /* Check if the particles can be made visible.  */
             if (particleSys.visible == false && pCount == 1)
@@ -767,6 +788,7 @@ function fallingParticlesMgr() {
             particle.position.z += particle.velocity.z * elapsed;
         }
         /* Reassign particle to main particles array  */
+        //console.log(pCount);
         particles[pCount] = particle;
     }
 }
@@ -817,10 +839,10 @@ function lowerParticlesMgr() {
             particle.position.x +
             particle.position.x * elapsed +
             1 /
-                2 *
-                lowerGloblPart.deaccel *
-                elapsed *
-                elapsed; /* Using speed 
+            2 *
+            lowerGloblPart.deaccel *
+            elapsed *
+            elapsed; /* Using speed 
 							       attenuation
 							       (deaccel).  */
         particle.position.z =
