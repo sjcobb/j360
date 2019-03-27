@@ -25,7 +25,12 @@ function CubemapToEquirectangular(renderer, provideCubeCamera, resolution) {
 		this.material
 	);
 	this.scene.add(this.quad);
-	this.camera = new THREE.OrthographicCamera(1 / -2, 1 / 2, 1 / 2, 1 / -2, -10000, 10000);
+
+	//*** https://github.com/imgntn/j360/issues/3 ***
+	// imgntn: "I don't think I'm copying the camera rotation into the cubeCamera the same way that I am with the position; I wonder if that's why changes to the rotation aren't sticking for you. I hadn't thought that people might want "front" to be a different direction than what it defaults to."
+
+	// this.camera = new THREE.OrthographicCamera(1 / -2, 1 / 2, 1 / 2, 1 / -2, -10000, 10000); //orig
+	this.camera = new THREE.OrthographicCamera(1 / -2 + 200, 1 / 2, 1 / 2, 1 / -2, -10000, 10000);
 
 	this.canvas = document.createElement('canvas');
 	this.ctx = this.canvas.getContext('2d');
